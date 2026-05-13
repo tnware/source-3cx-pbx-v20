@@ -3,8 +3,8 @@ data:
   name: "3CX XAPI"
   definitionId: "source-3cx-xapi"
   connectorType: source
-  dockerRepository: "ghcr.io/powercts/source-3cx-xapi"
-  dockerImageTag: "0.3.0"
+  dockerRepository: "ghcr.io/tnware/source-3cx-xapi"
+  dockerImageTag: "0.4.0"
   documentationUrl: ""
   releaseStage: custom
   license: MIT

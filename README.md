@@ -36,7 +36,7 @@ The image is built and pushed by `.github/workflows/image.yml` on every
 push to `main` (and on tags). To build locally:
 
 ```bash
-docker build -t ghcr.io/powercts/source-3cx-xapi:dev .
+docker build -t ghcr.io/tnware/source-3cx-xapi:dev .
 ```
 
 The image is built on top of `airbyte/python-connector-base` and uses
@@ -80,8 +80,8 @@ In the Airbyte UI:
 
 1. **Settings → Sources → New connector**
 2. **Add a new Docker connector**
-3. Image name: `ghcr.io/powercts/source-3cx-xapi`
-4. Image tag: pick a published tag (see [Releases](https://github.com/PowerCTS/source-3cx-xapi/releases))
+3. Image name: `ghcr.io/tnware/source-3cx-xapi`
+4. Image tag: pick a published tag (see [Releases](https://github.com/tnware/source-3cx-xapi/releases))
 
 If the image is in a private GHCR package, set up an `imagePullSecrets`
 entry on the Airbyte worker pod referencing a GHCR PAT.

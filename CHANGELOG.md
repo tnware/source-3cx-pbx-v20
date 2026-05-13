@@ -6,6 +6,18 @@ backwards-incompatible field changes; patch on bug fixes only.
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-05-13
+
+### Fixed
+- `metadata.yaml` `dockerRepository` corrected from
+  `ghcr.io/powercts/source-3cx-xapi` to `ghcr.io/tnware/source-3cx-xapi`
+  to match the actual GHCR location (the GHA workflow uses
+  `github.repository_owner` which resolves to `tnware`). Published
+  v0.3.0 images landed at the correct path; only the metadata pointer
+  was wrong.
+- README references updated to the correct GHCR path and the correct
+  GitHub repo URL.
+
 ## [0.3.0] — 2026-05-13
 
 ### Added
