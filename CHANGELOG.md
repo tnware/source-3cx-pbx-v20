@@ -1,18 +1,9 @@
 # Changelog
 
-All notable changes to this connector are documented here. Versions follow
-[Semantic Versioning](https://semver.org/) — bump the minor on new streams or
-backwards-incompatible field changes; patch on bug fixes only.
-
-## [Unreleased]
-
-> **Repo + package renamed to `source-3cx-pbx-v20`** (was
-> `source-3cx-xapi`). New Docker image path:
-> `ghcr.io/tnware/source-3cx-pbx-v20`. The old path
-> (`ghcr.io/tnware/source-3cx-xapi:0.4.0` and earlier) remains pullable
-> for anything pinned to it. Python package renamed `source_3cx_xapi`
-> → `source_3cx_pbx_v20`. Release-please will format this into a
-> proper entry on the next release cut.
+All notable changes to this connector are documented here. Versions
+follow [Semantic Versioning](https://semver.org/) and are managed by
+[release-please](https://github.com/googleapis/release-please) — see
+the `Releases & commit style` section in the README.
 
 ## [0.4.0] — 2026-05-13
 
