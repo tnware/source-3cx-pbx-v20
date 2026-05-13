@@ -86,6 +86,28 @@ In the Airbyte UI:
 If the image is in a private GHCR package, set up an `imagePullSecrets`
 entry on the Airbyte worker pod referencing a GHCR PAT.
 
+## Releases & commit style
+
+Releases are automated by [release-please](https://github.com/googleapis/release-please).
+Commit to `main` using [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+feat: add new Foo endpoint        → minor bump (0.4.0 → 0.5.0)
+fix:  handle null EmailAddress    → patch bump (0.4.0 → 0.4.1)
+chore: bump action versions       → no release (hidden from changelog)
+feat!: drop deprecated cursor     → major bump (note the !)
+```
+
+Release-please watches `main` and maintains a rolling **Release PR** that:
+- Bumps `pyproject.toml` `version` and `metadata.yaml` `dockerImageTag`
+  in lockstep
+- Appends a categorized entry to `CHANGELOG.md`
+- When merged, cuts a `vX.Y.Z` tag and a GitHub Release. The
+  `image.yml` workflow picks up the tag and builds + pushes the
+  versioned image.
+
+Don't hand-edit versions or the CHANGELOG — release-please owns those.
+
 ## CHANGELOG
 
 See [CHANGELOG.md](CHANGELOG.md).
