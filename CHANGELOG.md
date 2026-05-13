@@ -4,6 +4,17 @@ All notable changes to this connector are documented here. Versions follow
 [Semantic Versioning](https://semver.org/) — bump the minor on new streams or
 backwards-incompatible field changes; patch on bug fixes only.
 
+## [0.5.0](https://github.com/tnware/source-3cx-pbx-v20/compare/v0.4.0...v0.5.0) (2026-05-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* Docker image path, Python package import, and connector definitionId all change. No external consumers yet (only configured locally), so blast radius is the local Airbyte connection that hasn't been wired up.
+
+### Features
+
+* rename connector to source-3cx-pbx-v20 ([61f6308](https://github.com/tnware/source-3cx-pbx-v20/commit/61f6308b3dd0eefd554b4c6e197566835d945722))
+
 ## [Unreleased]
 
 > **Repo + package renamed to `source-3cx-pbx-v20`** (was
