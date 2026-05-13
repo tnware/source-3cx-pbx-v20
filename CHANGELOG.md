@@ -6,6 +6,27 @@ backwards-incompatible field changes; patch on bug fixes only.
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-05-13
+
+### Added
+- **Pytest suite** (42 tests) covering pure helpers (`parse_iso_duration`,
+  `_parse_iso_datetime`, `_start_of_month_n_ago`, `_period_from_config`),
+  the `ThreeCXClient` HTTP layer (auth, 401 re-auth, 429 backoff,
+  response-shape validation, pagination), `CallLogData` cursor logic,
+  `Users` stream mapping, and the queue-list cache.
+- CI gate: `image.yml` now runs `pytest` in a `test` job that the
+  `build` job depends on. Failing tests block the image push.
+- `[project.optional-dependencies] dev = ["pytest>=7.0", "responses>=0.23"]`
+  in pyproject.toml.
+
+### Changed
+- **Enriched all four JSON Schemas**: every field has a `description`;
+  timestamp fields use `format: date-time` + `airbyte_type:
+  timestamp_with_timezone`; date fields use `format: date` +
+  `airbyte_type: date`. Airbyte's typed destination will now create
+  proper `TIMESTAMPTZ` / `DATE` Postgres columns instead of `TEXT`,
+  removing the need for downstream type casts.
+
 ## [0.2.0] — 2026-05-13
 
 ### Added

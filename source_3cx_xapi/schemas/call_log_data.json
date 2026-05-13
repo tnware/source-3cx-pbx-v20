@@ -3,27 +3,90 @@
   "type": "object",
   "additionalProperties": true,
   "properties": {
-    "call_id":                  { "type": ["string", "null"] },
-    "seg_id":                   { "type": ["string", "null"] },
-    "call_type":                { "type": ["string", "null"] },
-    "direction":                { "type": ["string", "null"] },
-    "caller_number":            { "type": ["string", "null"] },
-    "caller_name":              { "type": ["string", "null"] },
-    "callee_number":            { "type": ["string", "null"] },
-    "callee_name":              { "type": ["string", "null"] },
-    "queue_name":               { "type": ["string", "null"] },
-    "agent_extension":          { "type": ["string", "null"] },
-    "agent_name":               { "type": ["string", "null"] },
-    "destination_dn":           { "type": ["string", "null"] },
-    "destination_display_name": { "type": ["string", "null"] },
-    "source_dn":                { "type": ["string", "null"] },
-    "source_display_name":      { "type": ["string", "null"] },
-    "start_time":               { "type": ["string", "null"], "format": "date-time" },
-    "end_time":                 { "type": ["string", "null"], "format": "date-time" },
-    "duration_seconds":         { "type": ["integer", "null"] },
-    "talk_time_seconds":        { "type": ["integer", "null"] },
-    "is_answered":              { "type": ["boolean", "null"] },
-    "status":                   { "type": ["string", "null"] },
-    "raw_talking_duration":     { "type": ["string", "null"] }
+    "call_id": {
+      "type": ["string", "null"],
+      "description": "3CX MainCallHistoryId (preferred) or CallHistoryId. Primary key for incremental syncs."
+    },
+    "seg_id": {
+      "type": ["string", "null"],
+      "description": "3CX SegmentId for the call leg."
+    },
+    "call_type": {
+      "type": ["string", "null"],
+      "description": "3CX call type classification (e.g. 'External', 'Internal')."
+    },
+    "direction": {
+      "type": ["string", "null"],
+      "description": "'Inbound', 'Outbound', 'Internal', or 'Inbound Queue'."
+    },
+    "caller_number": {
+      "type": ["string", "null"],
+      "description": "External or internal phone number of the caller."
+    },
+    "caller_name": {
+      "type": ["string", "null"]
+    },
+    "callee_number": {
+      "type": ["string", "null"]
+    },
+    "callee_name": {
+      "type": ["string", "null"]
+    },
+    "queue_name": {
+      "type": ["string", "null"],
+      "description": "Always NULL on this stream — queue assignments are tracked separately in queue_performance_overview."
+    },
+    "agent_extension": {
+      "type": ["string", "null"],
+      "description": "3CX extension number of the agent on this call (destination DN for Inbound, source DN for Outbound)."
+    },
+    "agent_name": {
+      "type": ["string", "null"]
+    },
+    "destination_dn": {
+      "type": ["string", "null"],
+      "description": "Raw 3CX destination directory number."
+    },
+    "destination_display_name": {
+      "type": ["string", "null"]
+    },
+    "source_dn": {
+      "type": ["string", "null"],
+      "description": "Raw 3CX source directory number."
+    },
+    "source_display_name": {
+      "type": ["string", "null"]
+    },
+    "start_time": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "airbyte_type": "timestamp_with_timezone",
+      "description": "Cursor field for incremental syncs. ISO 8601 with Z suffix (UTC)."
+    },
+    "end_time": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "airbyte_type": "timestamp_with_timezone",
+      "description": "Always NULL — 3CX's GetCallLogData OData function does not return a call-end timestamp. Compute downstream from start_time + duration_seconds if needed."
+    },
+    "duration_seconds": {
+      "type": ["integer", "null"],
+      "description": "Total call duration in seconds: ringing + talking time."
+    },
+    "talk_time_seconds": {
+      "type": ["integer", "null"],
+      "description": "Talking duration only, in seconds. Excludes ringing."
+    },
+    "is_answered": {
+      "type": ["boolean", "null"],
+      "description": "Whether the call was answered. Maps to 3CX 'Answered'."
+    },
+    "status": {
+      "type": ["string", "null"]
+    },
+    "raw_talking_duration": {
+      "type": ["string", "null"],
+      "description": "Original 3CX ISO 8601 duration string (e.g. 'PT3M12.139836S'). Preserved for audit; the integer talk_time_seconds is derived from this."
+    }
   }
 }

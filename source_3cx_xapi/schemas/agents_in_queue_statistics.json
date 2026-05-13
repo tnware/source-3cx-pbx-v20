@@ -3,19 +3,56 @@
   "type": "object",
   "additionalProperties": true,
   "properties": {
-    "agent_dn":               { "type": ["string", "null"] },
-    "agent_display_name":     { "type": ["string", "null"] },
-    "queue_dn":               { "type": ["string", "null"] },
-    "queue_display_name":     { "type": ["string", "null"] },
-    "period_start":           { "type": ["string", "null"], "format": "date" },
-    "period_end":             { "type": ["string", "null"], "format": "date" },
-    "answered_count":         { "type": ["integer", "null"] },
-    "answered_percent":       { "type": ["number", "null"] },
-    "ring_time_seconds":      { "type": ["integer", "null"] },
-    "avg_ring_time_seconds":  { "type": ["integer", "null"] },
-    "talk_time_seconds":      { "type": ["integer", "null"] },
-    "avg_talk_time_seconds":  { "type": ["integer", "null"] },
-    "logged_in_time_seconds": { "type": ["integer", "null"] },
-    "lost_count":             { "type": ["integer", "null"] }
+    "agent_dn": {
+      "type": ["string", "null"],
+      "description": "3CX agent extension. Composite primary key with queue_dn and period."
+    },
+    "agent_display_name": {
+      "type": ["string", "null"]
+    },
+    "queue_dn": {
+      "type": ["string", "null"]
+    },
+    "queue_display_name": {
+      "type": ["string", "null"]
+    },
+    "period_start": {
+      "type": ["string", "null"],
+      "format": "date",
+      "airbyte_type": "date"
+    },
+    "period_end": {
+      "type": ["string", "null"],
+      "format": "date",
+      "airbyte_type": "date"
+    },
+    "answered_count": {
+      "type": ["integer", "null"],
+      "description": "Number of calls this agent answered for this queue in the period."
+    },
+    "answered_percent": {
+      "type": ["number", "null"],
+      "description": "Percentage of calls offered to this agent that were answered."
+    },
+    "ring_time_seconds": {
+      "type": ["integer", "null"]
+    },
+    "avg_ring_time_seconds": {
+      "type": ["integer", "null"]
+    },
+    "talk_time_seconds": {
+      "type": ["integer", "null"]
+    },
+    "avg_talk_time_seconds": {
+      "type": ["integer", "null"]
+    },
+    "logged_in_time_seconds": {
+      "type": ["integer", "null"],
+      "description": "Total time this agent was logged into the queue during the period."
+    },
+    "lost_count": {
+      "type": ["integer", "null"],
+      "description": "Calls that rang this agent but were not answered (abandoned, timed out, redirected)."
+    }
   }
 }

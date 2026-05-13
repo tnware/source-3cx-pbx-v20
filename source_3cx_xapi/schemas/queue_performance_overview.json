@@ -3,14 +3,41 @@
   "type": "object",
   "additionalProperties": true,
   "properties": {
-    "queue_dn":                  { "type": ["string", "null"] },
-    "queue_display_name":        { "type": ["string", "null"] },
-    "extension_dn":              { "type": ["string", "null"] },
-    "extension_display_name":    { "type": ["string", "null"] },
-    "answered_count":            { "type": ["integer", "null"] },
-    "talk_time_seconds":         { "type": ["integer", "null"] },
-    "avg_talk_time_seconds":     { "type": ["integer", "null"] },
-    "period_start":              { "type": ["string", "null"], "format": "date" },
-    "period_end":                { "type": ["string", "null"], "format": "date" }
+    "queue_dn": {
+      "type": ["string", "null"],
+      "description": "3CX queue directory number. Composite primary key with extension_dn and period."
+    },
+    "queue_display_name": {
+      "type": ["string", "null"]
+    },
+    "extension_dn": {
+      "type": ["string", "null"],
+      "description": "3CX agent extension this row represents."
+    },
+    "extension_display_name": {
+      "type": ["string", "null"]
+    },
+    "answered_count": {
+      "type": ["integer", "null"],
+      "description": "Number of calls this extension answered for this queue in the period."
+    },
+    "talk_time_seconds": {
+      "type": ["integer", "null"]
+    },
+    "avg_talk_time_seconds": {
+      "type": ["integer", "null"]
+    },
+    "period_start": {
+      "type": ["string", "null"],
+      "format": "date",
+      "airbyte_type": "date",
+      "description": "Inclusive start of the reporting window (set by the connector from lookback_months config)."
+    },
+    "period_end": {
+      "type": ["string", "null"],
+      "format": "date",
+      "airbyte_type": "date",
+      "description": "Inclusive end of the reporting window (today)."
+    }
   }
 }
