@@ -2,8 +2,8 @@
 
 import pytest
 
-from source_3cx_xapi.client import parse_iso_duration, _odata_datetime
-from source_3cx_xapi.streams import (
+from source_3cx_pbx_v20.client import parse_iso_duration, _odata_datetime
+from source_3cx_pbx_v20.streams import (
     _parse_iso_datetime,
     _start_of_month_n_ago,
     _period_from_config,
@@ -74,7 +74,7 @@ class TestStartOfMonthNAgo:
     def test_zero_returns_current_month_start(self, monkeypatch):
         """N=0 should return the 1st of the current month."""
         # Freeze "today" by monkeypatching the date class.
-        import source_3cx_xapi.streams as streams_mod
+        import source_3cx_pbx_v20.streams as streams_mod
 
         class FixedDate(date):
             @classmethod
@@ -85,7 +85,7 @@ class TestStartOfMonthNAgo:
         assert _start_of_month_n_ago(0) == date(2026, 5, 1)
 
     def test_crosses_year_boundary(self, monkeypatch):
-        import source_3cx_xapi.streams as streams_mod
+        import source_3cx_pbx_v20.streams as streams_mod
 
         class FixedDate(date):
             @classmethod

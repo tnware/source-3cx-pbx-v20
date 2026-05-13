@@ -9,6 +9,6 @@ COPY . ./
 RUN pip install --no-cache-dir .
 
 # AIRBYTE_ENTRYPOINT is required by the Airbyte v2 workload runner
-ENV AIRBYTE_ENTRYPOINT="python -m source_3cx_xapi"
+ENV AIRBYTE_ENTRYPOINT="python -m source_3cx_pbx_v20"
 
-ENTRYPOINT ["python", "-m", "source_3cx_xapi"]
+ENTRYPOINT ["python", "-m", "source_3cx_pbx_v20"]

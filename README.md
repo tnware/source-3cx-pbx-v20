@@ -1,4 +1,4 @@
-# source-3cx-xapi
+# source-3cx-pbx-v20
 
 Airbyte custom source connector for the [3CX PBX Management API](https://www.3cx.com/docs/manual/api/) (XAPI).
 
@@ -36,7 +36,7 @@ The image is built and pushed by `.github/workflows/image.yml` on every
 push to `main` (and on tags). To build locally:
 
 ```bash
-docker build -t ghcr.io/tnware/source-3cx-xapi:dev .
+docker build -t ghcr.io/tnware/source-3cx-pbx-v20:dev .
 ```
 
 The image is built on top of `airbyte/python-connector-base` and uses
@@ -48,16 +48,16 @@ Standard Airbyte connector entrypoints:
 
 ```bash
 # Spec
-python -m source_3cx_xapi spec
+python -m source_3cx_pbx_v20 spec
 
 # Connection check
-python -m source_3cx_xapi check --config /path/to/secrets/config.json
+python -m source_3cx_pbx_v20 check --config /path/to/secrets/config.json
 
 # Catalog discovery
-python -m source_3cx_xapi discover --config /path/to/secrets/config.json
+python -m source_3cx_pbx_v20 discover --config /path/to/secrets/config.json
 
 # Read a stream
-python -m source_3cx_xapi read \
+python -m source_3cx_pbx_v20 read \
   --config /path/to/secrets/config.json \
   --catalog /path/to/integration_tests/configured_catalog.json
 ```
@@ -80,8 +80,8 @@ In the Airbyte UI:
 
 1. **Settings → Sources → New connector**
 2. **Add a new Docker connector**
-3. Image name: `ghcr.io/tnware/source-3cx-xapi`
-4. Image tag: pick a published tag (see [Releases](https://github.com/tnware/source-3cx-xapi/releases))
+3. Image name: `ghcr.io/tnware/source-3cx-pbx-v20`
+4. Image tag: pick a published tag (see [Releases](https://github.com/tnware/source-3cx-pbx-v20/releases))
 
 If the image is in a private GHCR package, set up an `imagePullSecrets`
 entry on the Airbyte worker pod referencing a GHCR PAT.

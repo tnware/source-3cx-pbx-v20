@@ -6,6 +6,14 @@ backwards-incompatible field changes; patch on bug fixes only.
 
 ## [Unreleased]
 
+> **Repo + package renamed to `source-3cx-pbx-v20`** (was
+> `source-3cx-xapi`). New Docker image path:
+> `ghcr.io/tnware/source-3cx-pbx-v20`. The old path
+> (`ghcr.io/tnware/source-3cx-xapi:0.4.0` and earlier) remains pullable
+> for anything pinned to it. Python package renamed `source_3cx_xapi`
+> → `source_3cx_pbx_v20`. Release-please will format this into a
+> proper entry on the next release cut.
+
 ## [0.4.0] — 2026-05-13
 
 ### Fixed
@@ -63,7 +71,8 @@ backwards-incompatible field changes; patch on bug fixes only.
   strings sort lexicographically, so this is safe.
 - `Source3cxXapi.streams()` now returns four streams instead of three.
 - Bumped `dockerRepository` in metadata.yaml to
-  `ghcr.io/powercts/source-3cx-xapi`.
+  `ghcr.io/powercts/source-3cx-xapi` (corrected to `tnware/source-3cx-xapi` in v0.4.0;
+  renamed to `tnware/source-3cx-pbx-v20` in the post-0.4.0 rename).
 
 ### Fixed
 - Version sync: `pyproject.toml` and `metadata.yaml` now agree

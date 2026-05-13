@@ -5,7 +5,7 @@ import json
 import pytest
 import responses
 
-from source_3cx_xapi.client import ThreeCXClient
+from source_3cx_pbx_v20.client import ThreeCXClient
 
 
 @pytest.fixture
@@ -98,7 +98,7 @@ class TestGet:
     @responses.activate
     def test_429_backs_off_and_retries(self, client, monkeypatch):
         # Don't actually sleep during the test.
-        import source_3cx_xapi.client as client_mod
+        import source_3cx_pbx_v20.client as client_mod
         monkeypatch.setattr(client_mod.time, "sleep", lambda *_: None)
 
         _stub_token()

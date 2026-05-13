@@ -17,7 +17,7 @@ from .streams import (
 log = logging.getLogger(__name__)
 
 
-class Source3cxXapi(AbstractSource):
+class Source3cxPbxV20(AbstractSource):
     """Airbyte source connector for the 3CX PBX XAPI."""
 
     def check_connection(self, logger, config: Mapping[str, Any]) -> Tuple[bool, Any]:

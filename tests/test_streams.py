@@ -7,7 +7,7 @@ import pytest
 
 from airbyte_cdk.models import SyncMode
 
-from source_3cx_xapi.streams import (
+from source_3cx_pbx_v20.streams import (
     CallLogData,
     QueuePerformanceOverview,
     AgentsInQueueStatistics,
@@ -31,7 +31,7 @@ CONFIG = {
 class TestCallLogDataCursor:
     @pytest.fixture
     def stream(self):
-        with patch("source_3cx_xapi.streams.ThreeCXClient"):
+        with patch("source_3cx_pbx_v20.streams.ThreeCXClient"):
             return CallLogData(CONFIG)
 
     def test_picks_later_of_two_iso_datetimes(self, stream):
@@ -72,7 +72,7 @@ class TestCallLogDataCursor:
 
 class TestUsersStream:
     def _build_stream(self, mock_users):
-        with patch("source_3cx_xapi.streams.ThreeCXClient") as MockClient:
+        with patch("source_3cx_pbx_v20.streams.ThreeCXClient") as MockClient:
             instance = MockClient.return_value
             instance.get_users.return_value = mock_users
             return Users(CONFIG)
@@ -128,7 +128,7 @@ class TestQueueListCache:
             {"QueueDn": "8001", "QueueDisplayName": "Sales"},
         ]
 
-        with patch("source_3cx_xapi.streams.ThreeCXClient") as MockClient:
+        with patch("source_3cx_pbx_v20.streams.ThreeCXClient") as MockClient:
             instance = MockClient.return_value
             instance.get_queue_performance_overview.return_value = queue_rows
             instance.get_agents_in_queue_statistics.return_value = []

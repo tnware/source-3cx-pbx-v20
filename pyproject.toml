@@ -3,7 +3,7 @@ requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "source-3cx-xapi"
+name = "source-3cx-pbx-v20"
 version = "0.4.0"
 description = "Airbyte source connector for the 3CX PBX XAPI"
 requires-python = ">=3.10"
@@ -19,11 +19,11 @@ dev = [
 ]
 
 [project.scripts]
-source-3cx-xapi = "source_3cx_xapi.__main__:run"
+source-3cx-pbx-v20 = "source_3cx_pbx_v20.__main__:run"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["source_3cx_xapi*"]
+include = ["source_3cx_pbx_v20*"]
 
 [tool.setuptools.package-data]
-"source_3cx_xapi" = ["spec.yaml", "schemas/*.json"]
+"source_3cx_pbx_v20" = ["spec.yaml", "schemas/*.json"]
