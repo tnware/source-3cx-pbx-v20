@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "call_id":                  { "type": ["string", "null"] },
+    "seg_id":                   { "type": ["string", "null"] },
+    "call_type":                { "type": ["string", "null"] },
+    "direction":                { "type": ["string", "null"] },
+    "caller_number":            { "type": ["string", "null"] },
+    "caller_name":              { "type": ["string", "null"] },
+    "callee_number":            { "type": ["string", "null"] },
+    "callee_name":              { "type": ["string", "null"] },
+    "queue_name":               { "type": ["string", "null"] },
+    "agent_extension":          { "type": ["string", "null"] },
+    "agent_name":               { "type": ["string", "null"] },
+    "destination_dn":           { "type": ["string", "null"] },
+    "destination_display_name": { "type": ["string", "null"] },
+    "source_dn":                { "type": ["string", "null"] },
+    "source_display_name":      { "type": ["string", "null"] },
+    "start_time":               { "type": ["string", "null"], "format": "date-time" },
+    "end_time":                 { "type": ["string", "null"], "format": "date-time" },
+    "duration_seconds":         { "type": ["integer", "null"] },
+    "talk_time_seconds":        { "type": ["integer", "null"] },
+    "is_answered":              { "type": ["boolean", "null"] },
+    "status":                   { "type": ["string", "null"] },
+    "raw_talking_duration":     { "type": ["string", "null"] }
+  }
+}

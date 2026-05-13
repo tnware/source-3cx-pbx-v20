@@ -1,0 +1,31 @@
+metadataSpecVersion: "1.0"
+data:
+  name: "3CX XAPI"
+  definitionId: "source-3cx-xapi"
+  connectorType: source
+  dockerRepository: "ghcr.io/powercts/source-3cx-xapi"
+  dockerImageTag: "0.2.0"
+  documentationUrl: ""
+  releaseStage: custom
+  license: MIT
+  supportLevel: community
+  connectorSubtype: api
+  supportedSyncModes:
+    - incremental
+    - full_refresh
+  streams:
+    - name: call_log_data
+      defaultCursorField: ["start_time"]
+      sourceDefinedCursor: true
+      supportedSyncModes:
+        - incremental
+        - full_refresh
+    - name: queue_performance_overview
+      supportedSyncModes:
+        - full_refresh
+    - name: agents_in_queue_statistics
+      supportedSyncModes:
+        - full_refresh
+    - name: users
+      supportedSyncModes:
+        - full_refresh

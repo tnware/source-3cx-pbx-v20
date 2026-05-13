@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+.DS_Store
+
+# local connector run artifacts
+config.json
+state.json
+catalog.json
+catalog_full.json
+config_narrow.json
+secrets/
+*.local.json

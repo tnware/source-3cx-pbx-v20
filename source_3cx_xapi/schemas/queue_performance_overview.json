@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "queue_dn":                  { "type": ["string", "null"] },
+    "queue_display_name":        { "type": ["string", "null"] },
+    "extension_dn":              { "type": ["string", "null"] },
+    "extension_display_name":    { "type": ["string", "null"] },
+    "answered_count":            { "type": ["integer", "null"] },
+    "talk_time_seconds":         { "type": ["integer", "null"] },
+    "avg_talk_time_seconds":     { "type": ["integer", "null"] },
+    "period_start":              { "type": ["string", "null"], "format": "date" },
+    "period_end":                { "type": ["string", "null"], "format": "date" }
+  }
+}

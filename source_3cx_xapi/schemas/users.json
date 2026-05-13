@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "extension": {
+      "type": "string",
+      "description": "3CX extension number. Primary key for the (email → extension) join used by downstream analytics."
+    },
+    "display_name": {
+      "type": ["string", "null"],
+      "description": "Human-readable display name shown in 3CX UI and call logs."
+    },
+    "first_name": {
+      "type": ["string", "null"]
+    },
+    "last_name": {
+      "type": ["string", "null"]
+    },
+    "email": {
+      "type": ["string", "null"],
+      "description": "User's email address as configured in 3CX. Used to join Zendesk users to 3CX extensions."
+    },
+    "is_enabled": {
+      "type": ["boolean", "null"],
+      "description": "Whether the 3CX account is enabled. Disabled accounts are still emitted so downstream consumers can choose how to handle them."
+    },
+    "auth_id": {
+      "type": ["string", "null"],
+      "description": "3CX-internal user identifier (UUID)."
+    },
+    "mobile_number": {
+      "type": ["string", "null"]
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "agent_dn":               { "type": ["string", "null"] },
+    "agent_display_name":     { "type": ["string", "null"] },
+    "queue_dn":               { "type": ["string", "null"] },
+    "queue_display_name":     { "type": ["string", "null"] },
+    "period_start":           { "type": ["string", "null"], "format": "date" },
+    "period_end":             { "type": ["string", "null"], "format": "date" },
+    "answered_count":         { "type": ["integer", "null"] },
+    "answered_percent":       { "type": ["number", "null"] },
+    "ring_time_seconds":      { "type": ["integer", "null"] },
+    "avg_ring_time_seconds":  { "type": ["integer", "null"] },
+    "talk_time_seconds":      { "type": ["integer", "null"] },
+    "avg_talk_time_seconds":  { "type": ["integer", "null"] },
+    "logged_in_time_seconds": { "type": ["integer", "null"] },
+    "lost_count":             { "type": ["integer", "null"] }
+  }
+}
