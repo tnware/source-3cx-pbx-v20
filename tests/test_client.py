@@ -208,9 +208,9 @@ class TestGetUsers:
 
     @responses.activate
     def test_paginates_until_short_page(self, client, monkeypatch):
-        # Override PAGE_SIZE so we don't need 1000 mock records to exercise
-        # the loop.
-        monkeypatch.setattr(ThreeCXClient, "PAGE_SIZE", 2)
+        # Override the Users page-size constant so we don't need 100
+        # mock records to exercise the loop.
+        monkeypatch.setattr(ThreeCXClient, "USERS_PAGE_SIZE", 2)
 
         _stub_token()
         responses.add(

@@ -64,6 +64,11 @@ class ThreeCXClient:
     """Client for the 3CX XAPI (read-only)."""
 
     PAGE_SIZE = 1000
+    # /xapi/v1/Users rejects `$top` values above ~100 with a 400 Bad
+    # Request — server-side OData validation, not a connector concern.
+    # 100 matches 3CX's own admin tooling default and is the largest
+    # value we've observed accepted in the wild.
+    USERS_PAGE_SIZE = 100
     MAX_RETRIES = 3
     RETRY_BACKOFF = 5  # seconds
 
@@ -257,8 +262,9 @@ class ThreeCXClient:
         """Fetch the full 3CX user / extension master.
 
         Standard OData collection at ``/xapi/v1/Users`` with $top/$skip
-        pagination. The list is typically small (tens to low-hundreds);
-        the pagination loop is defensive rather than load-bearing.
+        pagination. Uses ``USERS_PAGE_SIZE`` (default 100) because that
+        endpoint enforces a smaller $top cap than the rest of the API
+        — passing 1000 returns a 400 Bad Request.
         """
         all_records: list[dict] = []
         skip = 0
@@ -266,7 +272,7 @@ class ThreeCXClient:
         while True:
             url = f"{self.base_url}{path}"
             records = self._get_collection(
-                url, params={"$top": self.PAGE_SIZE, "$skip": skip}
+                url, params={"$top": self.USERS_PAGE_SIZE, "$skip": skip}
             )
             if not records:
                 break
@@ -275,7 +281,7 @@ class ThreeCXClient:
                 "Users: fetched %d records (total: %d)",
                 len(records), len(all_records),
             )
-            if len(records) < self.PAGE_SIZE:
+            if len(records) < self.USERS_PAGE_SIZE:
                 break
-            skip += self.PAGE_SIZE
+            skip += self.USERS_PAGE_SIZE
         return all_records
