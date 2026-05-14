@@ -5,6 +5,13 @@ follow [Semantic Versioning](https://semver.org/) and are managed by
 [release-please](https://github.com/googleapis/release-please) — see
 the `Releases & commit style` section in the README.
 
+## [0.5.3](https://github.com/tnware/source-3cx-pbx-v20/compare/v0.5.2...v0.5.3) (2026-05-14)
+
+
+### Bug Fixes
+
+* lower /Users page size to 100 ([#10](https://github.com/tnware/source-3cx-pbx-v20/issues/10)) ([75d54b5](https://github.com/tnware/source-3cx-pbx-v20/commit/75d54b582ebe8eaaf38ca520e04e07a6d26d313d))
+
 ## [0.5.2](https://github.com/tnware/source-3cx-pbx-v20/compare/v0.5.1...v0.5.2) (2026-05-14)
 
 
