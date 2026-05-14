@@ -25,19 +25,32 @@ DEFAULT_TIMEOUT_SECONDS = 60
 
 
 def parse_iso_duration(s):
-    """Convert ISO 8601 duration (e.g. ``PT3M12.139836S``) to integer seconds.
+    """Convert ISO 8601 duration (e.g. ``PT3M12.139836S``, ``P1DT2H``) to
+    integer seconds.
+
+    Accepts the full pattern 3CX's XAPI emits per its OpenAPI spec:
+    ``^-?P([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+([.][0-9]+)?S)?)?$``.
+    Notably this includes the days component, which the prior regex
+    silently zeroed — call durations >24h, multi-day shift aggregates,
+    and large queue talk-time rollups all need it.
 
     Returns 0 if the string is None, empty, or unparseable.
     """
     if not s:
         return 0
-    m = re.match(r"^PT(?:(\d+)H)?(?:(\d+)M)?(?:([\d.]+)S)?$", s, re.IGNORECASE)
+    m = re.match(
+        r"^(-)?P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:([\d.]+)S)?)?$",
+        s,
+        re.IGNORECASE,
+    )
     if not m:
         return 0
-    hours = int(m.group(1) or 0)
-    minutes = int(m.group(2) or 0)
-    seconds = float(m.group(3) or 0)
-    return int(hours * 3600 + minutes * 60 + seconds)
+    sign = -1 if m.group(1) else 1
+    days = int(m.group(2) or 0)
+    hours = int(m.group(3) or 0)
+    minutes = int(m.group(4) or 0)
+    seconds = float(m.group(5) or 0)
+    return sign * int(days * 86400 + hours * 3600 + minutes * 60 + seconds)
 
 
 def _odata_datetime(dt):

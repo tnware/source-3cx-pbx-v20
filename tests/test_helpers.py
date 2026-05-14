@@ -30,6 +30,28 @@ class TestParseIsoDuration:
     def test_parses_valid_durations(self, value, expected):
         assert parse_iso_duration(value) == expected
 
+    @pytest.mark.parametrize(
+        "value,expected",
+        [
+            ("P1D", 86_400),
+            ("P2D", 172_800),
+            ("P1DT2H", 86_400 + 7200),
+            ("P1DT2H30M", 86_400 + 7200 + 1800),
+            ("P1DT2H30M15S", 86_400 + 7200 + 1800 + 15),
+            # Days-only with no time component still parses cleanly.
+            ("P7D", 604_800),
+        ],
+    )
+    def test_parses_durations_with_day_component(self, value, expected):
+        """3CX's spec allows P([0-9]+D)?T... — calls >24h, shift
+        aggregates, and large queue rollups all rely on this."""
+        assert parse_iso_duration(value) == expected
+
+    def test_accepts_negative_sign(self):
+        """The spec regex includes an optional leading ``-``. Unlikely
+        in practice but parse it rather than silently zero."""
+        assert parse_iso_duration("-PT5S") == -5
+
     @pytest.mark.parametrize("value", [None, "", "garbage", "PT", "3 minutes"])
     def test_returns_zero_for_invalid(self, value):
         assert parse_iso_duration(value) == 0
