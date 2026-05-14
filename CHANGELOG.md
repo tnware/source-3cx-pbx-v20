@@ -5,6 +5,13 @@ follow [Semantic Versioning](https://semver.org/) and are managed by
 [release-please](https://github.com/googleapis/release-please) — see
 the `Releases & commit style` section in the README.
 
+## [0.5.2](https://github.com/tnware/source-3cx-pbx-v20/compare/v0.5.1...v0.5.2) (2026-05-14)
+
+
+### Bug Fixes
+
+* version-tag the connector image on release ([#7](https://github.com/tnware/source-3cx-pbx-v20/issues/7)) ([2f5a77e](https://github.com/tnware/source-3cx-pbx-v20/commit/2f5a77e56f6d1bbfa9b76d619f9f1face01b5c0d))
+
 ## [0.5.1](https://github.com/tnware/source-3cx-pbx-v20/compare/v0.5.0...v0.5.1) (2026-05-14)
 
 
