@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "queue_dn": {
+      "type": ["string", "null"],
+      "description": "3CX queue directory number (the queue's extension number). Primary key."
+    },
+    "queue_display_name": {
+      "type": ["string", "null"],
+      "description": "Human-readable queue name configured in 3CX."
+    }
+  }
+}

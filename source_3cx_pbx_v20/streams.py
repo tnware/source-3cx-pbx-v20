@@ -5,10 +5,11 @@ Four streams:
 - ``CallLogData`` — incremental by ``start_time`` cursor, OData $top/$skip,
   fetched in 7-day chunks to keep individual requests under the Airbyte
   workload timeout.
-- ``QueuePerformanceOverview`` — full refresh over a rolling lookback window.
-- ``AgentsInQueueStatistics`` — full refresh, sliced per queue DN. Queue
-  list is cached on the instance so ``stream_slices`` and ``read_records``
-  don't both pay for it.
+- ``Queues`` — full refresh of the 3CX queue master from ``/xapi/v1/Queues``.
+  Emits one row per queue (DN + display name).
+- ``AgentsInQueueStatistics`` — full refresh, sliced per queue DN. Reuses
+  the queue list from the ``Queues`` stream via a per-instance cache so
+  ``stream_slices`` and ``read_records`` don't each pay for it.
 - ``Users`` — full refresh of the 3CX extension/user master.
 
 Output field names match the destination column names expected by the
@@ -228,41 +229,27 @@ class CallLogData(Stream):
 
 
 # ---------------------------------------------------------------------------
-# Shared queue-list cache for the two queue-driven streams
+# Queues — full refresh of the 3CX queue master
 # ---------------------------------------------------------------------------
 
-class _QueueListMixin:
-    """Adds a per-instance cache of the queue list.
+class Queues(Stream):
+    """3CX queue master.
 
-    Both ``QueuePerformanceOverview`` and ``AgentsInQueueStatistics`` need
-    the queue list to do their work; previously each fetched it
-    independently and ``AgentsInQueueStatistics`` even fetched it twice
-    (in ``stream_slices`` and again in ``read_records``). Cache it.
+    Source: ``GET /xapi/v1/Queues`` — standard OData collection. One row
+    per queue, keyed on the queue DN (``queue_dn``). Used downstream as
+    a master / dimension for joining queue stats to a human-readable
+    queue name, and used internally by ``AgentsInQueueStatistics`` to
+    enumerate queue DNs for slicing.
+
+    Full refresh on every sync since the queue list is small and changes
+    infrequently.
     """
 
-    def _queue_list(self) -> list[dict]:
-        if not hasattr(self, "_queue_cache") or self._queue_cache is None:
-            period_from, period_to = _period_from_config(self._config)
-            self._queue_cache = self._client.get_queue_performance_overview(
-                period_from, period_to
-            )
-        return self._queue_cache
-
-
-# ---------------------------------------------------------------------------
-# QueuePerformanceOverview — full refresh
-# ---------------------------------------------------------------------------
-
-class QueuePerformanceOverview(Stream, _QueueListMixin):
-    """Per-extension, per-queue stats over a rolling lookback window."""
-
-    primary_key = ["queue_dn", "extension_dn", "period_start", "period_end"]
+    primary_key = "queue_dn"
 
     def __init__(self, config: Mapping[str, Any]):
         super().__init__()
         self._client = _build_client(config)
-        self._config = config
-        self._queue_cache: Optional[list[dict]] = None
 
     @property
     def supported_sync_modes(self):
@@ -275,33 +262,29 @@ class QueuePerformanceOverview(Stream, _QueueListMixin):
         stream_slice: Mapping[str, Any] = None,
         stream_state: Mapping[str, Any] = None,
     ) -> Iterable[Mapping[str, Any]]:
-        period_from, period_to = _period_from_config(self._config)
-        period_start_str = period_from.date().isoformat()
-        period_end_str = period_to.date().isoformat()
-
-        for r in self._queue_list():
+        for r in self._client.list_queues():
+            number = r.get("Number")
+            if number is None:
+                # A queue with no DN can't be joined to anything — skip
+                # rather than emit a row with a NULL primary key.
+                continue
             yield {
-                "queue_dn": r.get("QueueDn", ""),
-                "queue_display_name": r.get("QueueDisplayName"),
-                "extension_dn": r.get("ExtensionDn", ""),
-                "extension_display_name": r.get("ExtensionDisplayName"),
-                "answered_count": r.get("ExtensionAnsweredCount", 0),
-                "talk_time_seconds": parse_iso_duration(r.get("TalkTime", "")),
-                "avg_talk_time_seconds": parse_iso_duration(r.get("AvgTalkTime", "")),
-                "period_start": period_start_str,
-                "period_end": period_end_str,
+                "queue_dn": str(number),
+                "queue_display_name": r.get("Name"),
             }
 
     def get_json_schema(self) -> Mapping[str, Any]:
-        return _load_schema("queue_performance_overview")
+        return _load_schema("queues")
 
 
 # ---------------------------------------------------------------------------
 # AgentsInQueueStatistics — full refresh, sliced by queue DN
 # ---------------------------------------------------------------------------
 
-class AgentsInQueueStatistics(Stream, _QueueListMixin):
-    """Per-agent, per-queue stats. Queue DNs are discovered dynamically."""
+class AgentsInQueueStatistics(Stream):
+    """Per-agent, per-queue stats. Queue DNs are discovered from
+    ``/xapi/v1/Queues`` and cached on the instance so ``stream_slices``
+    and ``read_records`` don't each pay for the lookup."""
 
     primary_key = ["agent_dn", "queue_dn", "period_start", "period_end"]
 
@@ -315,18 +298,25 @@ class AgentsInQueueStatistics(Stream, _QueueListMixin):
     def supported_sync_modes(self):
         return [SyncMode.full_refresh]
 
+    def _queue_list(self) -> list[dict]:
+        if self._queue_cache is None:
+            self._queue_cache = self._client.list_queues()
+        return self._queue_cache
+
     def stream_slices(
         self,
         sync_mode: SyncMode,
         cursor_field: list[str] = None,
         stream_state: Mapping[str, Any] = None,
     ) -> Iterable[Optional[Mapping[str, Any]]]:
-        """Discover unique queue DNs from the cached queue list."""
+        """One slice per unique queue. /Queues returns one row per
+        queue already, but we de-dup defensively on `Number` in case
+        the API ever changes."""
         seen: dict[str, str] = {}
         for r in self._queue_list():
-            qdn = r.get("QueueDn", "")
+            qdn = r.get("Number", "")
             if qdn and qdn not in seen:
-                seen[qdn] = r.get("QueueDisplayName", "")
+                seen[qdn] = r.get("Name", "")
         for qdn, qname in seen.items():
             yield {"queue_dn": qdn, "queue_display_name": qname}
 

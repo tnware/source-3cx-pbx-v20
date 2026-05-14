@@ -9,7 +9,7 @@ from airbyte_cdk.models import SyncMode
 
 from source_3cx_pbx_v20.streams import (
     CallLogData,
-    QueuePerformanceOverview,
+    Queues,
     AgentsInQueueStatistics,
     Users,
 )
@@ -123,14 +123,14 @@ class TestQueueListCache:
         """`stream_slices` and `read_records` should share a single fetch
         of the queue list, not refetch it twice."""
         queue_rows = [
-            {"QueueDn": "8000", "QueueDisplayName": "Support"},
-            {"QueueDn": "8000", "QueueDisplayName": "Support"},  # dup → deduped
-            {"QueueDn": "8001", "QueueDisplayName": "Sales"},
+            {"Number": "8000", "Name": "Support"},
+            {"Number": "8000", "Name": "Support"},  # dup → deduped
+            {"Number": "8001", "Name": "Sales"},
         ]
 
         with patch("source_3cx_pbx_v20.streams.ThreeCXClient") as MockClient:
             instance = MockClient.return_value
-            instance.get_queue_performance_overview.return_value = queue_rows
+            instance.list_queues.return_value = queue_rows
             instance.get_agents_in_queue_statistics.return_value = []
 
             stream = AgentsInQueueStatistics(CONFIG)
@@ -141,8 +141,45 @@ class TestQueueListCache:
             for sl in slices:
                 list(stream.read_records(SyncMode.full_refresh, stream_slice=sl))
 
-            # Only ONE call to get_queue_performance_overview, not 1+slices.
-            assert instance.get_queue_performance_overview.call_count == 1
+            # Only ONE call to list_queues, not 1+slices.
+            assert instance.list_queues.call_count == 1
             # Two unique queues
             assert len(slices) == 2
             assert {s["queue_dn"] for s in slices} == {"8000", "8001"}
+
+
+# ----------------------------------------------------------------------
+# Queues stream — record mapping + skip-on-missing-number
+# ----------------------------------------------------------------------
+
+class TestQueuesStream:
+    def _build_stream(self, mock_queues):
+        with patch("source_3cx_pbx_v20.streams.ThreeCXClient") as MockClient:
+            instance = MockClient.return_value
+            instance.list_queues.return_value = mock_queues
+            return Queues(CONFIG)
+
+    def test_emits_one_row_per_queue(self):
+        stream = self._build_stream([
+            {"Number": "8000", "Name": "Support"},
+            {"Number": "8001", "Name": "Sales"},
+        ])
+        records = list(stream.read_records(SyncMode.full_refresh))
+        assert [r["queue_dn"] for r in records] == ["8000", "8001"]
+        assert records[0]["queue_display_name"] == "Support"
+
+    def test_skips_queues_with_no_number(self):
+        stream = self._build_stream([
+            {"Number": None, "Name": "No DN"},
+            {"Number": "8000", "Name": "Has DN"},
+        ])
+        records = list(stream.read_records(SyncMode.full_refresh))
+        assert len(records) == 1
+        assert records[0]["queue_dn"] == "8000"
+
+    def test_stringifies_numeric_dn(self):
+        """Number could come back as int — coerce to str to match
+        the destination column type (varchar)."""
+        stream = self._build_stream([{"Number": 8000, "Name": "Support"}])
+        records = list(stream.read_records(SyncMode.full_refresh))
+        assert records[0]["queue_dn"] == "8000"
