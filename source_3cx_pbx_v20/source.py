@@ -10,7 +10,7 @@ from .client import ThreeCXClient
 from .streams import (
     AgentsInQueueStatistics,
     CallLogData,
-    QueuePerformanceOverview,
+    Queues,
     Users,
 )
 
@@ -32,7 +32,7 @@ class Source3cxPbxV20(AbstractSource):
     def streams(self, config: Mapping[str, Any]) -> List[Stream]:
         return [
             CallLogData(config),
-            QueuePerformanceOverview(config),
+            Queues(config),
             AgentsInQueueStatistics(config),
             Users(config),
         ]

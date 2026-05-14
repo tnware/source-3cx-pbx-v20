@@ -21,7 +21,7 @@ data:
       supportedSyncModes:
         - incremental
         - full_refresh
-    - name: queue_performance_overview
+    - name: queues
       supportedSyncModes:
         - full_refresh
     - name: agents_in_queue_statistics

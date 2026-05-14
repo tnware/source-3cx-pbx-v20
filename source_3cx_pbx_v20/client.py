@@ -228,16 +228,24 @@ class ThreeCXClient:
             skip += self.PAGE_SIZE
         return all_records
 
-    def get_queue_performance_overview(self, period_from, period_to) -> list[dict]:
-        """Fetch queue performance overview for all queues."""
-        path = (
-            f"/xapi/v1/ReportQueuePerformanceOverview/Pbx.GetQueuePerformanceOverviewData("
-            f"periodFrom={_odata_datetime(period_from)},"
-            f"periodTo={_odata_datetime(period_to)},"
-            f"queueDns='',waitInterval='0:00:0')"
+    def list_queues(self) -> list[dict]:
+        """List queue entities from `/xapi/v1/Queues`.
+
+        Returns one row per queue with ``Number`` (the queue DN) and
+        ``Name`` (display name). Used to slice
+        ``AgentsInQueueStatistics`` by queue.
+
+        We deliberately don't paginate here — a single PBX rarely has
+        more than a few dozen queues, and the OData `$top` default
+        sits comfortably above that. If an install ever has more than
+        200 queues, raise the cap or add pagination.
+        """
+        path = "/xapi/v1/Queues"
+        records = self._get_collection(
+            f"{self.base_url}{path}",
+            params={"$top": 200, "$select": "Number,Name"},
         )
-        records = self._get_collection(f"{self.base_url}{path}")
-        log.info("QueuePerformanceOverview: fetched %d records", len(records))
+        log.info("Queues: fetched %d records", len(records))
         return records
 
     def get_agents_in_queue_statistics(
