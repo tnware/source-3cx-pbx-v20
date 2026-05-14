@@ -171,6 +171,17 @@ class CallLogData(Stream):
                 ringing_seconds = parse_iso_duration(raw_ringing)
                 total_duration = ringing_seconds + talk_seconds
 
+                # Direction is an unconstrained string in the XAPI spec
+                # (Pbx.CallLogData has no enum on this field). Values
+                # observed empirically against PowerCTS data:
+                #   "Inbound" / "Inbound Queue" — external caller; agent
+                #     is on the destination side.
+                #   "Outbound" — agent dials out; agent is on the source.
+                #   "Internal" — extension-to-extension; both sides are
+                #     agents. Attribute to the caller (SourceDn);
+                #     downstream can filter on `direction = 'Internal'`
+                #     to exclude or split if a model wants different
+                #     handling.
                 direction = r.get("Direction", "") or ""
                 is_inbound = direction.lower() in ("inbound", "inbound queue")
 
