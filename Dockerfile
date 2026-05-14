@@ -1,4 +1,4 @@
-FROM airbyte/python-connector-base:2.0.0
+FROM airbyte/python-connector-base:4.1.0
 
 WORKDIR /airbyte/integration_code
 
