@@ -1,11 +1,11 @@
-metadataSpecVersion: "1.0"
+metadataSpecVersion: '1.0'
 data:
-  name: "3CX PBX V20"
-  definitionId: "source-3cx-pbx-v20"
+  name: 3CX PBX V20
+  definitionId: source-3cx-pbx-v20
   connectorType: source
-  dockerRepository: "ghcr.io/tnware/source-3cx-pbx-v20"
-  dockerImageTag: "0.4.0"
-  documentationUrl: ""
+  dockerRepository: ghcr.io/tnware/source-3cx-pbx-v20
+  dockerImageTag: 0.5.0
+  documentationUrl: ''
   releaseStage: custom
   license: MIT
   supportLevel: community
@@ -15,7 +15,8 @@ data:
     - full_refresh
   streams:
     - name: call_log_data
-      defaultCursorField: ["start_time"]
+      defaultCursorField:
+        - start_time
       sourceDefinedCursor: true
       supportedSyncModes:
         - incremental
