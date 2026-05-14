@@ -27,7 +27,7 @@ Create the client in **3CX → Admin → Integrations → API**:
 | `fqdn`            | yes      | Hostname of the 3CX server, e.g. `pbx.example.com`. No protocol prefix.                                     |
 | `client_id`       | yes      | OAuth2 client ID from the XAPI application.                                                                 |
 | `client_secret`   | yes      | OAuth2 client secret. Marked as Airbyte secret.                                                             |
-| `start_date`      | yes      | `YYYY-MM-DD`. First date to pull `call_log_data` from on the first sync. Cursor advances from there.        |
+| `start_date`      | yes      | `YYYY-MM-DD`. First date to pull `call_log_data` from on the first sync, interpreted as midnight UTC. Cursor advances from there. |
 | `lookback_months` | no       | Default 2. Rolling window for the queue-aggregate streams. Doesn't affect `call_log_data` or `users`.        |
 
 ## Build + push
