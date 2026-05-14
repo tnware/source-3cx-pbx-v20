@@ -5,6 +5,20 @@ follow [Semantic Versioning](https://semver.org/) and are managed by
 [release-please](https://github.com/googleapis/release-please) — see
 the `Releases & commit style` section in the README.
 
+## [0.5.1](https://github.com/tnware/source-3cx-pbx-v20/compare/v0.5.0...v0.5.1) (2026-05-14)
+
+
+### Bug Fixes
+
+* accept day component in parse_iso_duration ([b292aa9](https://github.com/tnware/source-3cx-pbx-v20/commit/b292aa9f81d30f49cfb1c4e8fe8f4ae48c8f8cb2))
+* accept day component in parse_iso_duration ([9538a31](https://github.com/tnware/source-3cx-pbx-v20/commit/9538a319343eaefb165ed133558307d12b322d59))
+
+
+### Documentation
+
+* document the four observed Direction values ([#5](https://github.com/tnware/source-3cx-pbx-v20/issues/5)) ([7f15704](https://github.com/tnware/source-3cx-pbx-v20/commit/7f157042445e6e938f2ee98d6442b5e623c6a98f))
+* note that start_date is interpreted as midnight UTC ([#6](https://github.com/tnware/source-3cx-pbx-v20/issues/6)) ([01d4ce6](https://github.com/tnware/source-3cx-pbx-v20/commit/01d4ce63d884d1de9225a30ceb05cf14eb4af7a7))
+
 ## [0.5.0](https://github.com/tnware/source-3cx-pbx-v20/compare/v0.4.0...v0.5.0) (2026-05-14)
 
 
