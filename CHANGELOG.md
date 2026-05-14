@@ -5,6 +5,13 @@ follow [Semantic Versioning](https://semver.org/) and are managed by
 [release-please](https://github.com/googleapis/release-please) — see
 the `Releases & commit style` section in the README.
 
+## [0.5.4](https://github.com/tnware/source-3cx-pbx-v20/compare/v0.5.3...v0.5.4) (2026-05-14)
+
+
+### Features
+
+* replace queue_performance_overview with a /Queues-backed queues stream ([#12](https://github.com/tnware/source-3cx-pbx-v20/issues/12)) ([1d6fe1c](https://github.com/tnware/source-3cx-pbx-v20/commit/1d6fe1c8db6302668e3cf65ca567c1bc41ebd5eb))
+
 ## [0.5.3](https://github.com/tnware/source-3cx-pbx-v20/compare/v0.5.2...v0.5.3) (2026-05-14)
 
 
