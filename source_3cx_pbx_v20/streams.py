@@ -153,6 +153,12 @@ class CallLogData(Stream):
                 f"CallLogData cursor value could not be parsed as a date or "
                 f"datetime: {cursor_value!r}"
             )
+        # A bare YYYY-MM-DD parses as a naive datetime on Python 3.10; later
+        # we compare against datetime.now(timezone.utc) which is aware.
+        # Force UTC if the parsed value carries no tzinfo so we never mix
+        # offset-naive and offset-aware values.
+        if chunk_start.tzinfo is None:
+            chunk_start = chunk_start.replace(tzinfo=timezone.utc)
 
         period_to = datetime.now(timezone.utc)
 

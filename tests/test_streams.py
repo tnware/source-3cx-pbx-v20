@@ -67,6 +67,28 @@ class TestCallLogDataCursor:
 
 
 # ----------------------------------------------------------------------
+# CallLogData.read_records — chunk-walk init
+# ----------------------------------------------------------------------
+
+class TestCallLogDataReadRecords:
+    def test_bare_date_cursor_does_not_crash_on_naive_aware_comparison(self):
+        """Regression: a bare YYYY-MM-DD cursor parses as a naive
+        datetime on Python 3.10, which then can't be compared against
+        `datetime.now(timezone.utc)`. The chunk-walk loop must
+        normalize naive cursor values to UTC before the comparison."""
+        with patch("source_3cx_pbx_v20.streams.ThreeCXClient") as MockClient:
+            instance = MockClient.return_value
+            instance.get_call_log_data.return_value = []
+
+            stream = CallLogData(CONFIG)
+            records = list(stream.read_records(
+                SyncMode.incremental,
+                stream_state={"start_time": "2026-05-13"},
+            ))
+            assert records == []
+
+
+# ----------------------------------------------------------------------
 # Users stream — record mapping + skip-on-missing-extension
 # ----------------------------------------------------------------------
 

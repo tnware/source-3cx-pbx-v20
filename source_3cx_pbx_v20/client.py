@@ -231,19 +231,21 @@ class ThreeCXClient:
     def list_queues(self) -> list[dict]:
         """List queue entities from `/xapi/v1/Queues`.
 
-        Returns one row per queue with ``Number`` (the queue DN) and
-        ``Name`` (display name). Used to slice
-        ``AgentsInQueueStatistics`` by queue.
+        Returns the full Pbx.Queue record per queue. The connector only
+        consumes ``Number`` (the queue DN) and ``Name`` (display name);
+        the rest is harmless extra payload.
 
-        We deliberately don't paginate here — a single PBX rarely has
-        more than a few dozen queues, and the OData `$top` default
-        sits comfortably above that. If an install ever has more than
-        200 queues, raise the cap or add pagination.
+        We don't paginate — a single PBX rarely has more than a few dozen
+        queues. We deliberately don't pass ``$select`` either: some 3CX
+        V20 builds reject `/Queues?$select=...` with a 400 even though the
+        OData spec allows it. ``$top=100`` matches the per-install cap
+        observed empirically on ``/Users``. If an install ever has more
+        than 100 queues, raise the cap or add pagination.
         """
         path = "/xapi/v1/Queues"
         records = self._get_collection(
             f"{self.base_url}{path}",
-            params={"$top": 200, "$select": "Number,Name"},
+            params={"$top": 100},
         )
         log.info("Queues: fetched %d records", len(records))
         return records
