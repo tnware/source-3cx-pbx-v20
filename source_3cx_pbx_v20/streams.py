@@ -65,16 +65,44 @@ def _start_of_month_n_ago(n: int) -> date:
     return date(year, month, 1)
 
 
-def _period_from_config(config: Mapping[str, Any]) -> tuple[datetime, datetime]:
-    """Return (period_from, period_to) for full-refresh queue streams.
+def _periods_from_config(config: Mapping[str, Any]) -> list[tuple[datetime, datetime]]:
+    """Return one (period_from, period_to) tuple per month in the lookback.
 
-    period_from = first day of the month ``lookback_months`` ago
-    period_to   = end of today
+    The downstream dwh's v_kpi_calls_monthly view buckets queue stats by
+    ``EXTRACT(month FROM period_start)``, so each emitted record must
+    carry a ``period_start`` that identifies the specific month its
+    aggregates cover. A single big window — what this function used to
+    return — caused every row in a multi-month sync to be tagged with
+    the lookback's first day, lumping March/April/May activity into
+    the March bucket downstream.
+
+    Trade-off: one API call per (queue, month) instead of one call per
+    queue. With the default ``lookback_months=2`` that's 3 calls per
+    queue instead of 1 — acceptable; 3CX queue aggregates are cheap.
+
+    Tuples are oldest → newest. Each ``period_from`` is midnight UTC on
+    the first day of that month. ``period_to`` is end-of-day on the
+    month's last day, except for the current month, where it's
+    end-of-today (3CX has no data for future days).
     """
     lookback = int(config.get("lookback_months", 2))
-    period_from = datetime.combine(_start_of_month_n_ago(lookback), datetime.min.time())
-    period_to = datetime.combine(date.today(), datetime.max.time().replace(microsecond=0))
-    return period_from, period_to
+    today = date.today()
+    periods: list[tuple[datetime, datetime]] = []
+    for n in range(lookback, -1, -1):
+        first_day = _start_of_month_n_ago(n)
+        if first_day.year == today.year and first_day.month == today.month:
+            last_day = today
+        else:
+            # Last day of `first_day`'s month = day before next month's first day.
+            if first_day.month == 12:
+                next_first = date(first_day.year + 1, 1, 1)
+            else:
+                next_first = date(first_day.year, first_day.month + 1, 1)
+            last_day = next_first - timedelta(days=1)
+        period_from = datetime.combine(first_day, datetime.min.time())
+        period_to = datetime.combine(last_day, datetime.max.time().replace(microsecond=0))
+        periods.append((period_from, period_to))
+    return periods
 
 
 def _build_client(config: Mapping[str, Any]) -> ThreeCXClient:
@@ -333,31 +361,36 @@ class AgentsInQueueStatistics(Stream):
         stream_slice: Mapping[str, Any] = None,
         stream_state: Mapping[str, Any] = None,
     ) -> Iterable[Mapping[str, Any]]:
-        period_from, period_to = _period_from_config(self._config)
-        period_start_str = period_from.date().isoformat()
-        period_end_str = period_to.date().isoformat()
-
         queue_dn = (stream_slice or {}).get("queue_dn", "")
         queue_display_name = (stream_slice or {}).get("queue_display_name", "")
 
-        raw = self._client.get_agents_in_queue_statistics(queue_dn, period_from, period_to)
-        for r in raw:
-            yield {
-                "agent_dn": r.get("Dn", ""),
-                "agent_display_name": r.get("DnDisplayName", ""),
-                "queue_dn": queue_dn,
-                "queue_display_name": queue_display_name,
-                "period_start": period_start_str,
-                "period_end": period_end_str,
-                "answered_count": r.get("AnsweredCount", 0),
-                "answered_percent": r.get("AnsweredPercent", 0),
-                "ring_time_seconds": parse_iso_duration(r.get("RingTime", "")),
-                "avg_ring_time_seconds": parse_iso_duration(r.get("AvgRingTime", "")),
-                "talk_time_seconds": parse_iso_duration(r.get("TalkTime", "")),
-                "avg_talk_time_seconds": parse_iso_duration(r.get("AvgTalkTime", "")),
-                "logged_in_time_seconds": parse_iso_duration(r.get("LoggedInTime", "")),
-                "lost_count": r.get("LostCount", 0),
-            }
+        # One API call per (queue, month) so each emitted record's
+        # period_start identifies the specific monthly bucket its
+        # aggregates cover — see _periods_from_config for the why.
+        for period_from, period_to in _periods_from_config(self._config):
+            period_start_str = period_from.date().isoformat()
+            period_end_str = period_to.date().isoformat()
+
+            raw = self._client.get_agents_in_queue_statistics(
+                queue_dn, period_from, period_to,
+            )
+            for r in raw:
+                yield {
+                    "agent_dn": r.get("Dn", ""),
+                    "agent_display_name": r.get("DnDisplayName", ""),
+                    "queue_dn": queue_dn,
+                    "queue_display_name": queue_display_name,
+                    "period_start": period_start_str,
+                    "period_end": period_end_str,
+                    "answered_count": r.get("AnsweredCount", 0),
+                    "answered_percent": r.get("AnsweredPercent", 0),
+                    "ring_time_seconds": parse_iso_duration(r.get("RingTime", "")),
+                    "avg_ring_time_seconds": parse_iso_duration(r.get("AvgRingTime", "")),
+                    "talk_time_seconds": parse_iso_duration(r.get("TalkTime", "")),
+                    "avg_talk_time_seconds": parse_iso_duration(r.get("AvgTalkTime", "")),
+                    "logged_in_time_seconds": parse_iso_duration(r.get("LoggedInTime", "")),
+                    "lost_count": r.get("LostCount", 0),
+                }
 
     def get_json_schema(self) -> Mapping[str, Any]:
         return _load_schema("agents_in_queue_statistics")
