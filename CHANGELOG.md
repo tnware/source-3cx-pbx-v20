@@ -5,6 +5,13 @@ follow [Semantic Versioning](https://semver.org/) and are managed by
 [release-please](https://github.com/googleapis/release-please) — see
 the `Releases & commit style` section in the README.
 
+## [0.5.5](https://github.com/tnware/source-3cx-pbx-v20/compare/v0.5.4...v0.5.5) (2026-05-15)
+
+
+### Bug Fixes
+
+* CallLogData naive datetime crash; Queues 400 on $top=200/$select ([#25](https://github.com/tnware/source-3cx-pbx-v20/issues/25)) ([c82b7b7](https://github.com/tnware/source-3cx-pbx-v20/commit/c82b7b7a21ffcb5dd5bd931062f850c20b0347e7))
+
 ## [0.5.4](https://github.com/tnware/source-3cx-pbx-v20/compare/v0.5.3...v0.5.4) (2026-05-14)
 
 
