@@ -5,6 +5,13 @@ follow [Semantic Versioning](https://semver.org/) and are managed by
 [release-please](https://github.com/googleapis/release-please) — see
 the `Releases & commit style` section in the README.
 
+## [0.5.6](https://github.com/tnware/source-3cx-pbx-v20/compare/v0.5.5...v0.5.6) (2026-05-15)
+
+
+### Bug Fixes
+
+* emit AgentsInQueueStatistics per month, not per window ([#27](https://github.com/tnware/source-3cx-pbx-v20/issues/27)) ([ec8561d](https://github.com/tnware/source-3cx-pbx-v20/commit/ec8561d57054eb616136cc7d90a8953da1f6aa2f))
+
 ## [0.5.5](https://github.com/tnware/source-3cx-pbx-v20/compare/v0.5.4...v0.5.5) (2026-05-15)
 
 
