@@ -6,7 +6,7 @@ from source_3cx_pbx_v20.client import parse_iso_duration, _odata_datetime
 from source_3cx_pbx_v20.streams import (
     _parse_iso_datetime,
     _start_of_month_n_ago,
-    _period_from_config,
+    _periods_from_config,
 )
 from datetime import datetime, timezone, date
 
@@ -120,11 +120,35 @@ class TestStartOfMonthNAgo:
 
 
 # ----------------------------------------------------------------------
-# _period_from_config — uses lookback_months
+# _periods_from_config — one (period_from, period_to) tuple per month
 # ----------------------------------------------------------------------
 
-def test_period_from_config_respects_lookback():
-    period_from, period_to = _period_from_config({"lookback_months": 1})
-    assert period_from < period_to
-    # period_from should be on the 1st of some month
-    assert period_from.day == 1
+def test_periods_from_config_returns_one_tuple_per_month():
+    # lookback_months=2 covers (2 months ago + last month + current
+    # month) = 3 monthly buckets.
+    periods = _periods_from_config({"lookback_months": 2})
+    assert len(periods) == 3
+
+
+def test_periods_from_config_every_period_from_is_first_of_month():
+    periods = _periods_from_config({"lookback_months": 3})
+    for period_from, _ in periods:
+        assert period_from.day == 1
+
+
+def test_periods_from_config_ordered_oldest_first():
+    periods = _periods_from_config({"lookback_months": 4})
+    for i in range(len(periods) - 1):
+        assert periods[i][0] < periods[i + 1][0]
+
+
+def test_periods_from_config_defaults_to_lookback_2():
+    # Default lookback_months=2 → 3 monthly tuples.
+    periods = _periods_from_config({})
+    assert len(periods) == 3
+
+
+def test_periods_from_config_each_period_to_is_after_period_from():
+    periods = _periods_from_config({"lookback_months": 2})
+    for period_from, period_to in periods:
+        assert period_from < period_to

@@ -170,6 +170,45 @@ class TestQueueListCache:
             assert {s["queue_dn"] for s in slices} == {"8000", "8001"}
 
 
+class TestAgentsStreamMonthlyEmission:
+    """The connector must emit one record per (agent, queue, MONTH) so the
+    dwh's monthly aggregation buckets correctly. Previously a single
+    multi-month aggregate per (agent, queue) was being tagged with the
+    lookback start, lumping everything into one month downstream."""
+
+    def test_emits_one_record_per_month_per_agent(self):
+        queue_rows = [{"Number": "8000", "Name": "Support"}]
+        # The 3CX API would return this same shape for each per-month call.
+        fake_agent = {
+            "Dn": "100",
+            "DnDisplayName": "Agent A",
+            "AnsweredCount": 5,
+        }
+
+        with patch("source_3cx_pbx_v20.streams.ThreeCXClient") as MockClient:
+            instance = MockClient.return_value
+            instance.list_queues.return_value = queue_rows
+            instance.get_agents_in_queue_statistics.return_value = [fake_agent]
+
+            # lookback_months=2 → 3 months (2 ago + last + current)
+            stream = AgentsInQueueStatistics({**CONFIG, "lookback_months": 2})
+            slices = list(stream.stream_slices(SyncMode.full_refresh))
+            records = []
+            for sl in slices:
+                records.extend(
+                    stream.read_records(SyncMode.full_refresh, stream_slice=sl)
+                )
+
+            # 1 queue × 3 months × 1 mock agent
+            assert len(records) == 3
+            # Three distinct period_start values — proves the loop split
+            assert len({r["period_start"] for r in records}) == 3
+            # Every period_start is first-of-month
+            assert all(r["period_start"].endswith("-01") for r in records)
+            # API called once per month per queue
+            assert instance.get_agents_in_queue_statistics.call_count == 3
+
+
 # ----------------------------------------------------------------------
 # Queues stream — record mapping + skip-on-missing-number
 # ----------------------------------------------------------------------
