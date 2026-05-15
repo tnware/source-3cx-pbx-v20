@@ -22,3 +22,8 @@ catalog_full.json
 config_narrow.json
 secrets/
 *.local.json
+
+
+# Repo-internal documentation (CLAUDE memory file). Stays local —
+# contains operational context we don't want in the public repo.
+CLAUDE.md
