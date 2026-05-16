@@ -5,6 +5,17 @@ follow [Semantic Versioning](https://semver.org/) and are managed by
 [release-please](https://github.com/googleapis/release-please) — see
 the `Releases & commit style` section in the README.
 
+## [0.6.0](https://github.com/tnware/source-3cx-pbx-v20/compare/v0.5.6...v0.6.0) (2026-05-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* key CallLogData on CdrId, expose call-history FKs + ringing time ([#31](https://github.com/tnware/source-3cx-pbx-v20/issues/31))
+
+### Features
+
+* key CallLogData on CdrId, expose call-history FKs + ringing time ([#31](https://github.com/tnware/source-3cx-pbx-v20/issues/31)) ([49202e1](https://github.com/tnware/source-3cx-pbx-v20/commit/49202e1b2090c171b3acd19d81d3d64d7ecfae2f))
+
 ## [0.5.6](https://github.com/tnware/source-3cx-pbx-v20/compare/v0.5.5...v0.5.6) (2026-05-15)
 
 
