@@ -3,9 +3,17 @@
   "type": "object",
   "additionalProperties": true,
   "properties": {
-    "call_id": {
+    "cdr_id": {
       "type": ["string", "null"],
-      "description": "3CX MainCallHistoryId (preferred) or CallHistoryId. Primary key for incremental syncs."
+      "description": "3CX CdrId — per-leg unique identifier. Primary key for incremental syncs. Multi-leg calls (transfers, conferences, IVR→queue→agent routing) emit multiple rows, one per leg, each with a distinct cdr_id."
+    },
+    "main_call_history_id": {
+      "type": ["string", "null"],
+      "description": "3CX MainCallHistoryId — the root parent identifier shared by every CDR that belongs to the same logical call. Use this for 'count of unique calls' aggregations (e.g. COUNT(DISTINCT main_call_history_id) FILTER (...))."
+    },
+    "call_history_id": {
+      "type": ["string", "null"],
+      "description": "3CX CallHistoryId — intermediate grouping identifier. For simple single-leg calls it equals main_call_history_id; for transfer trees it identifies the sub-tree this leg belongs to."
     },
     "seg_id": {
       "type": ["string", "null"],
@@ -77,6 +85,10 @@
       "type": ["integer", "null"],
       "description": "Talking duration only, in seconds. Excludes ringing."
     },
+    "ringing_time_seconds": {
+      "type": ["integer", "null"],
+      "description": "Ringing duration only, in seconds. The portion of the call before the line was answered. Useful as the `wait_time_seconds` source downstream."
+    },
     "is_answered": {
       "type": ["boolean", "null"],
       "description": "Whether the call was answered. Maps to 3CX 'Answered'."
@@ -87,6 +99,10 @@
     "raw_talking_duration": {
       "type": ["string", "null"],
       "description": "Original 3CX ISO 8601 duration string (e.g. 'PT3M12.139836S'). Preserved for audit; the integer talk_time_seconds is derived from this."
+    },
+    "raw_ringing_duration": {
+      "type": ["string", "null"],
+      "description": "Original 3CX ISO 8601 duration string for ringing time. Preserved for audit; the integer ringing_time_seconds is derived from this."
     }
   }
 }

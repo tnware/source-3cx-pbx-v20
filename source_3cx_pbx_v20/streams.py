@@ -118,9 +118,21 @@ def _build_client(config: Mapping[str, Any]) -> ThreeCXClient:
 # ---------------------------------------------------------------------------
 
 class CallLogData(Stream):
-    """Per-call records, ingested incrementally by start_time."""
+    """Per-CDR records, ingested incrementally by start_time.
 
-    primary_key = "call_id"
+    Primary key is ``cdr_id`` — the 3CX schema's per-leg unique
+    identifier. Earlier versions of this connector used
+    ``MainCallHistoryId`` as the key, which is the **parent**
+    identifier shared across every leg of a logical call (transfers,
+    conferences, IVR-then-queue-then-agent chains). That caused
+    Airbyte's dedup-on-primary-key to silently keep only one row per
+    parent call and drop all other legs. The stream is now grained at
+    the CDR (one row per leg), with ``main_call_history_id`` and
+    ``call_history_id`` emitted as separate FK fields so downstream
+    models can group legs back into logical calls.
+    """
+
+    primary_key = "cdr_id"
     cursor_field = "start_time"
 
     # Fetch at most this many days per API call. Keeps each request small
@@ -221,7 +233,21 @@ class CallLogData(Stream):
                 is_inbound = direction.lower() in ("inbound", "inbound queue")
 
                 yield {
-                    "call_id": str(r.get("MainCallHistoryId") or r.get("CallHistoryId", "")),
+                    # cdr_id: 3CX's per-leg unique identifier (schema
+                    # type: String, non-nullable). Used as the airbyte
+                    # primary key so multi-leg calls aren't deduped.
+                    "cdr_id": str(r.get("CdrId", "")),
+                    # main_call_history_id: the root parent identifier
+                    # shared by every CDR that belongs to the same
+                    # logical call (transfers, conferences, IVR →
+                    # queue → agent chains all share this). Use this
+                    # for "count of unique calls" downstream.
+                    "main_call_history_id": r.get("MainCallHistoryId"),
+                    # call_history_id: intermediate grouping identifier.
+                    # For simple single-leg calls it equals
+                    # main_call_history_id; for transfer trees it
+                    # identifies the sub-tree this leg belongs to.
+                    "call_history_id": r.get("CallHistoryId"),
                     "seg_id": str(r.get("SegmentId", "")),
                     "call_type": r.get("CallType"),
                     "direction": direction,
@@ -251,9 +277,11 @@ class CallLogData(Stream):
                     "end_time": None,
                     "duration_seconds": total_duration,
                     "talk_time_seconds": talk_seconds,
+                    "ringing_time_seconds": ringing_seconds,
                     "is_answered": r.get("Answered", False),
                     "status": r.get("Status"),
                     "raw_talking_duration": raw_talking,
+                    "raw_ringing_duration": raw_ringing,
                 }
 
             chunk_start = chunk_end
